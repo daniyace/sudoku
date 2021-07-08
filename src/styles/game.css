@@ -1,0 +1,146 @@
+.grid {
+  margin-top: 4%;
+  position: relative;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: max-content;
+  max-width: 100%;
+  overflow: hidden;
+  min-height: 95vh;
+}
+.grid div {
+  height: 50px;
+}
+.cont {
+  width: 50px;
+  background-color: #91ff6540;
+  position: relative;
+  cursor: default;
+  border: 1px solid rgb(80, 80, 80);
+}
+.cont p {
+  margin-top: 12px;
+  font-family: 'Montserrat';
+  font-weight: 600;
+}
+.centertext {
+  position: relative;
+}
+.current {
+  position: absolute;
+  left: 0;
+  font-family: 'Montserrat';
+}
+.errors {
+  position: absolute;
+  right: 0;
+  font-family: 'Montserrat';
+}
+.tl {
+  border-radius: 20% 0 0 0;
+}
+.bl {
+  border-radius: 0 0 0 20%;
+}
+.tr {
+  border-radius: 0 20% 0 0;
+}
+.br {
+  border-radius: 0 0 20% 0;
+}
+.l {
+  border-right: 4px solid #000;
+}
+.b {
+  border-bottom: 4px solid #000;
+}
+.nums {
+  top: 30px;
+  position: relative;
+}
+.numsel {
+  width: 50px;
+  height: 50px;
+  background-color: rgba(240, 240, 240, 0.5);
+  position: relative;
+  cursor: default;
+  border: 1px solid #000;
+  border-radius: 20%;
+  transform: scale(0.8);
+}
+.numselvac {
+  width: 50px;
+  height: 50px;
+  background-color: rgb(255, 255, 255);
+  position: relative;
+  cursor: default;
+}
+.numsel p {
+  margin-top: 12px;
+  font-family: 'Montserrat';
+  font-weight: 600;
+}
+.active {
+  transform: scale(1) !important;
+  background-color: #91ff65ad;
+}
+.wrong {
+  transform: scale(1) !important;
+  background-color: #ff8465ad;
+}
+
+.res {
+  position: absolute;
+  top: 37.5% !important;
+  left: 27.5% !important;
+  background: #dc354685 !important;
+  border: none !important;
+  transition: all 1s ease-out;
+}
+
+.win {
+  position: absolute;
+  top: 37.5% !important;
+  left: 27.5% !important;
+  background: #3bdc35b9 !important;
+  border: none !important;
+  transition: all 1s ease-out;
+}
+@media (max-width: 550px) {
+  .grid {
+    margin-top: 5%;
+    min-width: max-content;
+  }
+  .grid div {
+    height: 45px;
+  }
+  .cont {
+    width: 45px;
+  }
+  .cont p {
+    margin-top: 10px;
+  }
+  .numsel {
+    width: 45px;
+    height: 45px;
+  }
+  .numsel p {
+    margin-top: 10px;
+  }
+  .current {
+    left: 10px;
+  }
+  .errors {
+    right: 20px;
+  }
+
+  .res {
+    top: 22% !important;
+    left: 30% !important;
+  }
+  .win {
+    top: 22% !important;
+    left: 30% !important;
+  }
+}
