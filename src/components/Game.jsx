@@ -1,19 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/game.css';
+import { motion } from 'framer-motion';
 
 function Game(props) {
   const size = 9;
   let ban = true;
   let numb = [
-    { number: 1, cant: 0 },
-    { number: 2, cant: 0 },
-    { number: 3, cant: 0 },
-    { number: 4, cant: 0 },
-    { number: 5, cant: 0 },
-    { number: 6, cant: 0 },
-    { number: 7, cant: 0 },
-    { number: 8, cant: 0 },
-    { number: 9, cant: 0 },
+    { number: 1, cant: 0, x: 0 },
+    { number: 2, cant: 0, x: 1 },
+    { number: 3, cant: 0, x: 2 },
+    { number: 4, cant: 0, x: 3 },
+    { number: 5, cant: 0, x: 4 },
+    { number: 6, cant: 0, x: 5 },
+    { number: 7, cant: 0, x: 6 },
+    { number: 8, cant: 0, x: 7 },
+    { number: 9, cant: 0, x: 8 },
+  ];
+  let cols = [
+    { state: false },
+    { state: false },
+    { state: false },
+    { state: false },
+    { state: false },
+    { state: false },
+    { state: false },
+    { state: false },
+    { state: true },
   ];
 
   const [grid, setGrid] = useState(false);
@@ -23,7 +35,7 @@ function Game(props) {
   const [current, setCurrent] = useState(false);
   const [numbers, setNumbers] = useState(numb);
   const [errors, setErrors] = useState(0);
-
+  const [cords, setCords] = useState(false);
   const start = () => {
     let matrix = [];
     let values = [];
@@ -229,11 +241,36 @@ function Game(props) {
         matrix[positions[i].x][positions[i].y].userVal = '‏‏‎ ‎';
       }
       if (numb) setNumbers(numb);
-      if (matrix) setGrid(grid);
+      if (matrix) {
+        setGrid(grid);
+      }
       props.setDiff(false);
     }
   }, [props.select, props.diff, first, grid, props, numbers]);
+  const variants = {
+    static: {
+      scale: 1,
+    },
+    animation: {
+      scale: 1,
+      backgroundColor: '#ffe365ad',
+      height: '2.1em',
+      width: '2.1em',
+      borderRadius: '10px',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      padding: '5px',
+      marginTop: '7px',
+      transition: {
+        type: 'spring',
 
+        duration: 1,
+      },
+    },
+    selected: {
+      scale: 1.5,
+    },
+  };
   if (grid)
     return (
       <div className='grid'>
@@ -247,7 +284,15 @@ function Game(props) {
         {grid.map((row, i) => (
           <div key={i}>
             {row.map((col, j) => (
-              <div
+              <motion.div
+                animate={{ rotateY: 360 }}
+                transition={{
+                  type: 'spring',
+                  /*  repeat: 1,
+                  repeatType: 'reverse', */
+                  delay: (col.x + col.y) * 0.05,
+                  duration: 1,
+                }}
                 key={j}
                 className={
                   col.userVal === col.content && current === col.userVal
@@ -259,13 +304,16 @@ function Game(props) {
                     : 'd-inline-flex'
                 }
               >
-                <div
+                <motion.div
                   onClick={() => {
                     handleLeftClick(col);
+                    if (cords)
+                      if (cords.x === col.x && cords.y === col.y)
+                        setCords(false);
+                      else setCords({ x: col.x, y: col.y });
+                    else setCords({ x: col.x, y: col.y });
                   }}
-                  onContextMenu={(e) => {
-                    handleRigthClick(e, col);
-                  }}
+                  onContextMenu={(e) => handleRigthClick(e, col)}
                   className={
                     i === 0 && j === 0
                       ? `cont ${col.content} tl`
@@ -284,9 +332,21 @@ function Game(props) {
                       : `cont ${col.content}`
                   }
                 >
-                  <p className='text-center'>{col.userVal}</p>
-                </div>
-              </div>
+                  <motion.p
+                    variants={variants}
+                    animate={
+                      cords.x === col.x || cords.y === col.y
+                        ? cords.x === col.x && cords.y === col.y
+                          ? 'selected'
+                          : 'animation'
+                        : 'static'
+                    }
+                    className='text-center'
+                  >
+                    {col.userVal}
+                  </motion.p>
+                </motion.div>
+              </motion.div>
             ))}
           </div>
         ))}
@@ -294,15 +354,30 @@ function Game(props) {
           <div className='d-inline-flex nums'>
             {numbers.map((num, j) =>
               num.cant > 0 ? (
-                <div
+                <motion.div
+                  style={{ scale: 1.01 }}
+                  animate={{
+                    scale: 0.8,
+                    rotateY: 360,
+                  }}
+                  transition={{
+                    type: 'spring',
+                    /*  repeat: 1,
+                    repeatType: 'reverse', */
+                    delay: num.number * 0.08,
+                    duration: 1,
+                  }}
                   className={
                     current === num.number ? 'numsel active' : 'numsel'
                   }
                   key={num.number}
-                  onClick={() => setCurrent(num.number)}
+                  onClick={() => {
+                    if (current === num.number) setCurrent(false);
+                    else setCurrent(num.number);
+                  }}
                 >
                   <p className='text-center'>{num.number}</p>
-                </div>
+                </motion.div>
               ) : (
                 <div className='numselvac' key={num.number} />
               )

@@ -6,7 +6,6 @@
   margin-right: auto;
   width: max-content;
   max-width: 100%;
-  overflow: hidden;
   min-height: 95vh;
 }
 .grid div {
@@ -88,6 +87,7 @@
 .wrong {
   transform: scale(1) !important;
   background-color: #ff8465ad;
+  border-radius: 20%;
 }
 
 .res {
@@ -134,7 +134,6 @@
   .errors {
     right: 20px;
   }
-
   .res {
     top: 22% !important;
     left: 30% !important;
