@@ -16,6 +16,17 @@ function Game(props) {
     { number: 8, cant: 0, x: 7 },
     { number: 9, cant: 0, x: 8 },
   ];
+  const sqares = [
+    [1, 1, 1, 2, 2, 2, 3, 3, 3],
+    [1, 1, 1, 2, 2, 2, 3, 3, 3],
+    [1, 1, 1, 2, 2, 2, 3, 3, 3],
+    [4, 4, 4, 5, 5, 5, 6, 6, 6],
+    [4, 4, 4, 5, 5, 5, 6, 6, 6],
+    [4, 4, 4, 5, 5, 5, 6, 6, 6],
+    [7, 7, 7, 8, 8, 8, 9, 9, 9],
+    [7, 7, 7, 8, 8, 8, 9, 9, 9],
+    [7, 7, 7, 8, 8, 8, 9, 9, 9],
+  ];
 
   const [grid, setGrid] = useState(false);
   const [first, setFirst] = useState(true);
@@ -26,6 +37,10 @@ function Game(props) {
   const [errors, setErrors] = useState(0);
   const [cords, setCords] = useState(false);
   const [animation, setAnimation] = useState(true);
+  const [colf, setColf] = useState(false);
+  const [rowf, setRowf] = useState(false);
+  const [square, setSquare] = useState(false);
+
   const start = () => {
     let matrix = [];
     let values = [];
@@ -59,6 +74,7 @@ function Game(props) {
           y: j,
           content: values[i][j],
           userVal: values[i][j],
+          sqr: sqares[i][j],
         };
     }
 
@@ -127,11 +143,50 @@ function Game(props) {
         }
         setNumbers(numb);
         endGame(numb);
+        completedRow(col, copy);
+        completedCol(col, copy);
+        completedSqare(col, copy);
       } else setErrors(errors + 1);
-
       setGrid(copy);
     }
   };
+  const completedRow = (col, copy) => {
+    let row = true;
+    for (let i = 0; i < size; i++) {
+      if (copy[col.x][i].userVal === '‏‏‎ ‎') {
+        row = false;
+      }
+    }
+    if (row) setRowf(true);
+  };
+  const completedCol = (col, copy) => {
+    let colu = true;
+    for (let i = 0; i < size; i++) {
+      if (copy[i][col.y].userVal === '‏‏‎ ‎') {
+        colu = false;
+      }
+    }
+    if (colu) setColf(true);
+  };
+
+  const completedSqare = (col, copy) => {
+    let arr = [];
+    let squa = true;
+    copy.forEach((colu) => {
+      colu.forEach((cell) => {
+        if (cell.sqr === col.sqr) {
+          arr.push(cell);
+        }
+      });
+    });
+    arr.forEach((cell) => {
+      if (cell.userVal === '‏‏‎ ‎') {
+        squa = false;
+      }
+    });
+    if (squa) setSquare(true);
+  };
+
   const endGame = (numb) => {
     ban = false;
     if (
@@ -153,6 +208,7 @@ function Game(props) {
       alert('Game Over');
     }
   };
+
   const reset = () => {
     props.setDiff(false);
     setGrid(false);
@@ -169,6 +225,24 @@ function Game(props) {
         setAnimation(false);
       }, 2000);
     }
+    if (colf) {
+      setTimeout(() => {
+        setColf(false);
+      }, 2000);
+    }
+    if (rowf) {
+      setTimeout(() => {
+        setRowf(false);
+      }, 2000);
+    }
+    if (square) {
+      setTimeout(() => {
+        setSquare(false);
+      }, 2000);
+    }
+  }, [animation, colf, rowf, square]);
+
+  useEffect(() => {
     const difficulty = [35, 45, 55, 65];
 
     if (first && props.select) {
@@ -236,12 +310,11 @@ function Game(props) {
         matrix[positions[i].x][positions[i].y].userVal = '‏‏‎ ‎';
       }
       if (numb) setNumbers(numb);
-      if (matrix) {
-        setGrid(grid);
-      }
+      if (matrix) setGrid(grid);
       props.setDiff(false);
     }
-  }, [props.select, props.diff, first, grid, props, numbers, animation]);
+  }, [props.select, props.diff, first, grid, props, numbers]);
+
   const variants = {
     static: {
       scale: 1,
@@ -261,6 +334,18 @@ function Game(props) {
         duration: 0.5,
       },
     },
+    popup: {
+      scale: [1, 1.8, 1.8, 1.8, 1],
+      backgroundColor: '#35a83bad',
+      height: '2.1em',
+      width: '2.1em',
+      borderRadius: '10px',
+      marginLeft: 'auto',
+      marginRight: 'auto',
+      padding: '5px',
+      marginTop: '7px',
+    },
+    completed: { scale: [1, 1.8, 1] },
     selected: {
       scale: [1, 2, 1],
       transition: {
@@ -275,6 +360,9 @@ function Game(props) {
     },
     active: { backgroundColor: '#91ff65ad' },
     numact: { scale: 0.8, rotateY: 360 },
+    hide: {
+      backgroundColor: '#fff',
+    },
   };
   if (grid)
     return (
@@ -298,9 +386,10 @@ function Game(props) {
                 }
                 transition={{
                   type: 'spring',
-                  /*  repeat: 1,
-                  repeatType: 'reverse', */
-                  delay: (col.x + col.y) * 0.05,
+                  delay:
+                    cords.x === col.x && cords.y === col.y
+                      ? 0
+                      : (col.x + col.y) * 0.05,
                   duration: 1,
                 }}
                 key={j}
@@ -320,8 +409,8 @@ function Game(props) {
                     if (cords)
                       if (cords.x === col.x && cords.y === col.y)
                         setCords(false);
-                      else setCords({ x: col.x, y: col.y });
-                    else setCords({ x: col.x, y: col.y });
+                      else setCords({ x: col.x, y: col.y, sqr: col.sqr });
+                    else setCords({ x: col.x, y: col.y, sqr: col.sqr });
                   }}
                   onContextMenu={(e) => handleRigthClick(e, col)}
                   className={
@@ -343,11 +432,18 @@ function Game(props) {
                   }
                 >
                   <motion.p
+                    style={{ marginLeft: 'auto', marginRight: 'auto' }}
                     variants={variants}
                     animate={
-                      cords.x === col.x || cords.y === col.y
+                      square && cords.sqr === col.sqr
+                        ? 'popup'
+                        : cords.x === col.x || cords.y === col.y
                         ? cords.x === col.x && cords.y === col.y
                           ? 'selected'
+                          : colf && cords.y === col.y
+                          ? 'popup'
+                          : rowf && cords.x === col.x
+                          ? 'popup'
                           : 'animation'
                         : 'static'
                     }
@@ -365,7 +461,7 @@ function Game(props) {
             {numbers.map((num, j) =>
               num.cant > 0 ? (
                 <motion.div
-                  style={{ scale: 1.1 }}
+                  style={{ scale: 1 }}
                   transition={{
                     delay: !animation ? 0 : num.number * 0.08,
                     duration: 0.3,
@@ -386,6 +482,7 @@ function Game(props) {
                 </motion.div>
               ) : (
                 <motion.div
+                  className='numselvac'
                   transition={{
                     delay: !animation ? 0 : num.number * 0.08,
                     duration: 0.3,
@@ -393,7 +490,9 @@ function Game(props) {
                   variants={vgrid}
                   animate={'hide'}
                   key={num.number}
-                ></motion.div>
+                >
+                  <p></p>
+                </motion.div>
               )
             )}
           </div>
