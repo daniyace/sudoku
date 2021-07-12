@@ -16,17 +16,6 @@ function Game(props) {
     { number: 8, cant: 0, x: 7 },
     { number: 9, cant: 0, x: 8 },
   ];
-  let cols = [
-    { state: false },
-    { state: false },
-    { state: false },
-    { state: false },
-    { state: false },
-    { state: false },
-    { state: false },
-    { state: false },
-    { state: true },
-  ];
 
   const [grid, setGrid] = useState(false);
   const [first, setFirst] = useState(true);
@@ -36,6 +25,7 @@ function Game(props) {
   const [numbers, setNumbers] = useState(numb);
   const [errors, setErrors] = useState(0);
   const [cords, setCords] = useState(false);
+  const [animation, setAnimation] = useState(true);
   const start = () => {
     let matrix = [];
     let values = [];
@@ -174,6 +164,11 @@ function Game(props) {
   };
 
   useEffect(() => {
+    if (animation) {
+      setTimeout(() => {
+        setAnimation(false);
+      }, 2000);
+    }
     const difficulty = [35, 45, 55, 65];
 
     if (first && props.select) {
@@ -246,7 +241,7 @@ function Game(props) {
       }
       props.setDiff(false);
     }
-  }, [props.select, props.diff, first, grid, props, numbers]);
+  }, [props.select, props.diff, first, grid, props, numbers, animation]);
   const variants = {
     static: {
       scale: 1,
@@ -263,13 +258,23 @@ function Game(props) {
       marginTop: '7px',
       transition: {
         type: 'spring',
-
-        duration: 1,
+        duration: 0.5,
       },
     },
     selected: {
-      scale: 1.5,
+      scale: [1, 2, 1],
+      transition: {
+        type: 'spring',
+        duration: 0.5,
+      },
     },
+  };
+  const vgrid = {
+    start: {
+      rotateY: 360,
+    },
+    active: { backgroundColor: '#91ff65ad' },
+    numact: { scale: 0.8, rotateY: 360 },
   };
   if (grid)
     return (
@@ -278,14 +283,19 @@ function Game(props) {
           <h5 className='current d-inline-flex'>
             {current ? `Current selection: ${current}` : 'No one selected'}
           </h5>
-          <h5 className='errors d-inline-flex'>Errors {errors}</h5>
+          <h5 className='errors d-inline-flex'>Errors: {errors}</h5>
         </div>
 
         {grid.map((row, i) => (
           <div key={i}>
             {row.map((col, j) => (
               <motion.div
-                animate={{ rotateY: 360 }}
+                variants={vgrid}
+                animate={
+                  col.userVal === col.content && current === col.userVal
+                    ? 'active'
+                    : 'start'
+                }
                 transition={{
                   type: 'spring',
                   /*  repeat: 1,
@@ -296,7 +306,7 @@ function Game(props) {
                 key={j}
                 className={
                   col.userVal === col.content && current === col.userVal
-                    ? 'active d-inline-flex'
+                    ? 'd-inline-flex'
                     : col.userVal === '‏‏‎ ‎'
                     ? 'd-inline-flex'
                     : col.userVal !== col.content
@@ -355,31 +365,35 @@ function Game(props) {
             {numbers.map((num, j) =>
               num.cant > 0 ? (
                 <motion.div
-                  style={{ scale: 1.01 }}
-                  animate={{
-                    scale: 0.8,
-                    rotateY: 360,
-                  }}
+                  style={{ scale: 1.1 }}
                   transition={{
-                    type: 'spring',
-                    /*  repeat: 1,
-                    repeatType: 'reverse', */
-                    delay: num.number * 0.08,
-                    duration: 1,
+                    delay: !animation ? 0 : num.number * 0.08,
+                    duration: 0.3,
                   }}
-                  className={
-                    current === num.number ? 'numsel active' : 'numsel'
-                  }
+                  variants={vgrid}
+                  animate={current === num.number ? 'active' : 'numact'}
+                  className={current === num.number ? 'numsel ' : 'numsel'}
                   key={num.number}
                   onClick={() => {
                     if (current === num.number) setCurrent(false);
-                    else setCurrent(num.number);
+                    else {
+                      setCords(false);
+                      setCurrent(num.number);
+                    }
                   }}
                 >
                   <p className='text-center'>{num.number}</p>
                 </motion.div>
               ) : (
-                <div className='numselvac' key={num.number} />
+                <motion.div
+                  transition={{
+                    delay: !animation ? 0 : num.number * 0.08,
+                    duration: 0.3,
+                  }}
+                  variants={vgrid}
+                  animate={'hide'}
+                  key={num.number}
+                ></motion.div>
               )
             )}
           </div>
